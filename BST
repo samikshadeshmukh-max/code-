@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *left, *right;
+};
+
+struct Node *insert(struct Node *r, int x) {
+    if (r == NULL) {
+        r = malloc(sizeof(struct Node));
+        r->data = x;
+        r->left = r->right = NULL;
+    } else if (x < r->data)
+        r->left = insert(r->left, x);
+    else if (x > r->data)
+        r->right = insert(r->right, x);
+    return r;
+}
+
+struct Node *search(struct Node *r, int x) {
+    if (!r || r->data == x) return r;
+    if (x < r->data) return search(r->left, x);
+    return search(r->right, x);
+}
+
+struct Node *delete(struct Node *r, int x) {
+    if (!r) return NULL;
+
+    if (x < r->data) r->left = delete(r->left, x);
+    else if (x > r->data) r->right = delete(r->right, x);
+    else {
+        if (!r->left) return r->right;
+        if (!r->right) return r->left;
+
+        struct Node *t = r->right;
+        while (t->left) t = t->left;
+
+        r->data = t->data;
+        r->right = delete(r->right, t->data);
+    }
+    return r;
+}
+
+void inorder(struct Node *r) {
+    if (r) {
+        inorder(r->left);
+        printf("%d ", r->data);
+        inorder(r->right);
+    }
+}
+
+void preorder(struct Node *r) {
+    if (r) {
+        printf("%d ", r->data);
+        preorder(r->left);
+        preorder(r->right);
+    }
+}
+
+void postorder(struct Node *r) {
+    if (r) {
+        postorder(r->left);
+        postorder(r->right);
+        printf("%d ", r->data);
+    }
+}
+
+int main() {
+    struct Node *root = NULL;
+    int ch, x, n;
+
+    printf("Number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter values: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &x);
+        root = insert(root, x);
+    }
+
+    do {
+        printf("\n1.Insert 2.Delete 3.Search");
+        printf("\n4.Inorder 5.Preorder 6.Postorder 0.Exit\n");
+        scanf("%d", &ch);
+
+        switch (ch) {
+        case 1:
+            scanf("%d", &x);
+            root = insert(root, x);
+            break;
+        case 2:
+            scanf("%d", &x);
+            root = delete(root, x);
+            break;
+        case 3:
+            scanf("%d", &x);
+            printf("%s\n", search(root, x) ? "Found" : "Not found");
+            break;
+        case 4: inorder(root); break;
+        case 5: preorder(root); break;
+        case 6: postorder(root); break;
+        }
+    } while (ch != 0);
+
+    return 0;
+}
